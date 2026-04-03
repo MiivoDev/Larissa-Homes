@@ -9,14 +9,8 @@ function figmaAssetPlugin(): Plugin {
     name: 'figma-asset-resolver',
     resolveId(id) {
       if (id.startsWith('figma:asset/')) {
-        return '\0' + id
-      }
-    },
-    load(id) {
-      if (id.startsWith('\0figma:asset/')) {
-        const assetPath = id.slice('\0figma:asset/'.length)
-        const url = `https://static.figma.com/make/assets/${assetPath}`
-        return `export default ${JSON.stringify(url)};`
+        const filename = id.slice('figma:asset/'.length)
+        return path.resolve(__dirname, 'src/assets', filename)
       }
     },
   }
