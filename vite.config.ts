@@ -2,9 +2,29 @@ import { defineConfig } from 'vite'
 import path from 'path'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
+import type { Plugin } from 'vite'
+
+function figmaAssetPlugin(): Plugin {
+  return {
+    name: 'figma-asset-resolver',
+    resolveId(id) {
+      if (id.startsWith('figma:asset/')) {
+        return '\0' + id
+      }
+    },
+    load(id) {
+      if (id.startsWith('\0figma:asset/')) {
+        const assetPath = id.slice('\0figma:asset/'.length)
+        const url = `https://static.figma.com/make/assets/${assetPath}`
+        return `export default ${JSON.stringify(url)};`
+      }
+    },
+  }
+}
 
 export default defineConfig({
   plugins: [
+    figmaAssetPlugin(),
     // The React and Tailwind plugins are both required for Make, even if
     // Tailwind is not being actively used – do not remove them
     react(),
